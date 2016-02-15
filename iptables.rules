@@ -1,0 +1,14 @@
+*filter
+:INPUT ACCEPT [1:32]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [328:24624]
+#Prevent SSH brute force
+-A INPUT -i eth0 -p tcp -m tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 4 --name DEFAULT --rsource -j DROP 
+-A INPUT -i eth0 -p tcp -m tcp --dport 22 -m state --state NEW -m recent --set --name DEFAULT --rsource 
+#Open only necessary ports
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT 
+-A INPUT -p icmp -j ACCEPT 
+-A INPUT -i lo -j ACCEPT 
+-A INPUT -p tcp -m tcp -m multiport ! --dports 80,443,8080,3306,8000,22,6600 -j DROP 
+-A INPUT -p udp -m udp -m multiport ! --dports 6600 -j DROP
+COMMIT
